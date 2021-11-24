@@ -1,14 +1,28 @@
 from flask import Flask, request
 import logging
-from utils import *
+# from utils import *
+import requests
+import os
 
-logging.getLogger().setLevel(logging.INFO)
 app = Flask(__name__)
 
 
 @app.route('/ping')
 def ping() -> str:
     return "pong"
+
+
+@app.route('/ping-preprocessing')
+def ping_preprocessing() -> str:
+    path = "http://data-preprocessing:5000/ping"
+    app.logger.info(f"calling: {path}")
+    try:
+        response = requests.get(path)
+        return response.text
+    except ConnectionRefusedError:
+        return "Couldn't do it"
+    except Exception:
+        return "Something really went wrong"
 
 
 @app.route('/get-anatomical-region', methods=["POST"])
@@ -20,11 +34,18 @@ def get_anatomical_region() -> str:
     # data should be a dictionary
     data = dict(request.form)
     app.logger.info(f"data: {data}")
+    return "brain"
+    # # take data and send it to get preprocessed
+    # data = preprocess_data()
+    #
+    # # send it to model
+    # result = perform_inference()
+    #
+    # return stringify_model_output(result)
 
-    # take data and send it to get preprocessed
-    data = preprocess_data()
 
-    # send it to model
-    result = perform_inference()
-
-    return stringify_model_output(result)
+if __name__ == "__main__":
+    # os.environ['NO_PROXY'] = '127.0.0.1'
+    logging.getLogger().setLevel(logging.INFO)
+    app.run(host='0.0.0.0')
+    app.logger.info("Starting up!")

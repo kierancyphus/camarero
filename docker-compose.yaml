@@ -15,3 +15,26 @@ services:
       dockerfile: Dockerfile
     ports:
       - "5000:5000"
+    # this is just to detect changes when in dev
+    volumes:
+      - ./gateway:/usr/src/app
+    depends_on:
+      - data-preprocessing
+    networks:
+      default:
+        aliases:
+          - gateway
+
+  data-preprocessing:
+    build:
+      context: data_preprocessing
+      dockerfile: Dockerfile
+    ports:
+      - "5001:5000"
+    # this is just a way to detect changes when in dev
+    volumes:
+      - ./data_preprocessing:/usr/src/app
+    networks:
+      default:
+        aliases:
+          - data-preprocessing
