@@ -12,20 +12,20 @@ class Ping(Resource):
 
 
 class HealthCheck(Resource):
-    def get(self) -> str:
+    def get(self):
         path = "http://data-preprocessing:5000/ping"
         app.logger.info(f"calling: {path}")
         try:
             response = requests.get(path)
             return response.text
         except ConnectionRefusedError:
-            return "Couldn't do it"
+            return "Couldn't do it", 500
         except Exception:
-            return "Something really went wrong"
+            return "Something really went wrong", 500
 
 
 class EvaluateModel(Resource):
-    def post(self) -> str:
+    def post(self):
         """
 
         :return: will be one of the regions specified in x file, or an error
@@ -33,11 +33,11 @@ class EvaluateModel(Resource):
         # request_data should be a dictionary
         request_data = dict(request.form)
         if "data" not in request_data:
-            return "Error: please ensure you have attached data"
+            return "Error: please ensure you have attached data", 400
         if "model_name" not in request_data:
-            return "Error: please include a model_name"
+            return "Error: please include a model_name", 400
         if request_data["model_name"] not in model_names:
-            return "Error: please ensure you are including a valid model name."
+            return "Error: please ensure you are including a valid model name.", 404
 
         app.logger.info(f"data: {request_data}")
 
@@ -46,7 +46,7 @@ class EvaluateModel(Resource):
         app.logger.info(f"preprocessed data: {request_data}")
 
         if not request_data:
-            return "Could not preprocess the data. Please ensure your data is in the right shape."
+            return "Could not preprocess the data", 500
 
         # send it to model
         result = perform_inference(request_data)
