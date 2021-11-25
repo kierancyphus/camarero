@@ -6,6 +6,11 @@ import os
 
 app = Flask(__name__)
 
+# Note: usually a global variable here is normally terrible because it is not thread safe. That being said,
+# these are going to be single threaded anyway and I will require the server to restart if we want to add
+# a new model.
+model_names = set(os.listdir('/usr/scr/models'))
+
 
 @app.route('/ping')
 def ping() -> str:
@@ -31,15 +36,22 @@ def get_anatomical_region() -> str:
 
     :return: will be one of the regions specified in x file, or an error
     """
-    # data should be a dictionary
-    data = dict(request.form)
-    app.logger.info(f"data: {data}")
+    # request_data should be a dictionary
+    request_data = dict(request.form)
+    if "data" not in request_data:
+        return "Error: please ensure you have attached data"
+    if "model_name" not in request_data:
+        return "Error: please include a model_name"
+    if request_data["model_name"] not in model_names:
+        return "Error: please ensure you are including a valid model name."
+
+    app.logger.info(f"data: {request_data}")
 
     # take data and send it to get preprocessed
-    data = preprocess_data(data)
-    app.logger.info(f"preprocessed data: {data}")
+    request_data = preprocess_data(request_data)
+    app.logger.info(f"preprocessed data: {request_data}")
     try:
-        return data["data"]
+        return request_data["data"]
     except Exception:
         return "Internal Error"
     # # send it to model

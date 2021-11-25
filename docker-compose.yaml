@@ -5,7 +5,7 @@ services:
 #    ports:
 #      - '8501:8501'
 #    volumes:
-#      - './inference/models:/models'
+#      - './models:/models'
 #    command:
 #      - '--model_config_file=/models/models.config'
 #      - '--model_config_file_poll_wait_seconds=60'
@@ -15,9 +15,9 @@ services:
       dockerfile: Dockerfile
     ports:
       - "5000:5000"
-    # this is just to detect changes when in dev
     volumes:
       - ./gateway:/usr/src/app
+      - ./models:/usr/src/models
     depends_on:
       - data-preprocessing
     networks:

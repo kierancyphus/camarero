@@ -11,17 +11,22 @@ class PreprocessingService(Resource):
         return self.preprocess_data(dict(request.form))
 
     def preprocess_data(self, request: Dict[str, str]) -> Dict[str, str]:
+        """
+        :param request: {data: ..., model_name: ...}, model_name specifies the kind of transformation
+                        that should be performed
+        :return: {data: tf_tensor, model_name: ...}
+        """
         try:
             np_array = np.array(json.loads(request["data"]))
         except KeyError:
-            app.logger.info("Error: request did not contain data")
+            app.logger.info(f"Error: request to model: {request['model_name']} did not contain data")
             return dict()
         except Exception as err:
             app.logger.info("Error: could not process the request")
             app.logger.debug(err)
             return dict()
 
-        # TODO perform some sort of preprocessing
+        # TODO perform some sort of preprocessing (should come from utils and be mapped to modelname)
         # np_array = some_transformation(np_array)
 
         # convert array to be able to send
