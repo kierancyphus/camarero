@@ -13,4 +13,10 @@ A simple docker network for handling requests, preprocessing data and serving tf
 - Server: docker image of tf-serving. We can't use the gpu version because it doesn't provide support for windows.
 
 ## Use
-`docker-compose something`
+### To start the inference service
+Make sure docker-compose is installed and then run
+`docker-compose up`.
+
+### To add a new model
+Add a new directory under `./models` with the model name you want, add another `config` entry in `./models/models.config`
+and then restart the service using `docker-compose up` to ensure that all services see the new model.
