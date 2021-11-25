@@ -1,7 +1,7 @@
 from flask import Flask, request
 import logging
-# from utils import *
 import requests
+from utils import preprocess_data
 import os
 
 app = Flask(__name__)
@@ -34,10 +34,14 @@ def get_anatomical_region() -> str:
     # data should be a dictionary
     data = dict(request.form)
     app.logger.info(f"data: {data}")
-    return "brain"
-    # # take data and send it to get preprocessed
-    # data = preprocess_data()
-    #
+
+    # take data and send it to get preprocessed
+    data = preprocess_data(data)
+    app.logger.info(f"preprocessed data: {data}")
+    try:
+        return data["data"]
+    except Exception:
+        return "Internal Error"
     # # send it to model
     # result = perform_inference()
     #
