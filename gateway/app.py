@@ -4,11 +4,12 @@ import logging
 import requests
 from utils import preprocess_data, perform_inference, stringify_model_output
 import os
+import pickle
 
 
 class Ping(Resource):
     def get(self) -> str:
-        return "pong"
+        return [{'label': 'smelly', 'index': 'engineers'}, {'something': 'else'}]
 
 
 class HealthCheck(Resource):
